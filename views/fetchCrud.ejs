@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel="stylesheet" href="/dist/css/bootstrap.min.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-8">
+          <div class="panel panel-default">
+            <div class="panel-heading">Create Product</div>
+            <div class="panel-body">
+              <form id = "registerform" action = "javascript:void(0)">
+                <label>Name:</label>
+                <input type="text" class="form-control" name="productName" id="productName" value= >
+                <label>Description:</label>
+                <textarea class="form-control" name="desc" id="desc" cols="" rows=""></textarea>
+                <label>Quantity:</label>
+                <input type="text" name="quantity" id="quantity" class="form-control">
+                <label>Expiration Date:</label>
+                <input type="date" name="expiration" id="expiration" class="form-control">
+                <br/>
+                <button class="btn btn-success" id="btnCreate" type="submit">Insert</button>
+              </form>
+          </div>
+          </div>
+        </div>
+        <div class="col-md-4" >
+          <br/>
+          <br/>
+          <div class="panel panel-success" id="panelDiv" style="visibility: hidden;">
+            <div class="panel-heading">Product Details</div>
+            <div class="panel-body">
+              <!-- <h4 class="panel-title"></h4> -->
+              <p class="panel-text"><strong>Name: </strong> <span id="txtProdName"></span></p>
+              <p class="panel-text"><strong>Description: </strong> <span id="txtProdDesc"></span></p>
+              <p class="panel-text"><strong>Quantity: </strong> <span id="txtProdQuantity"></span></p>
+              <p class="panel-text"><strong>Expiration: </strong> <span id="txtProdExp"></span></p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-12">
+        <br/>
+        <br/>
+          <div class="panel panel-default">
+            <div class="panel-heading">Product List</div>
+              <table class="table">
+                <thead class="thead-light">
+                  <tr>
+                    <th>Name</th>
+                    <th>Quantity</th>
+                    <th>Expiration Date</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+              <tbody id="tableBody">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class='main'>
+          <Notifications />
+                    ...
+        </div>
+      </div>
+  </body>
+</html>
+<script>
+
+
+let datalist;
+//onload
+(function(){
+  console.log('onload');
+  fetchApi();
+
+
+})();
+
+//event listener
+
+
+
+
+//function
+function fetchApi(){
+
+  var html=''
+  fetch('http://localhost:3001/product')
+  .then((response)=>response.json())
+  .then((data)=>{
+    console.log(JSON.stringify(data))
+    datalist = data.map(item =>{
+      html +=
+      '<tr class="table-success">'
+          +'<td class="table-active">'+item.product_name+'</td>'
+          +'<td class="table-active"> '+item.product_name+' </td>'
+          +'<td class="table-active"> '+item.expiration_date+' </td>'
+          +'<td class="table-active"> <button class="btn btn-danger"  data-id='+ item._id +' id="btnDelete">Delete</button> <button class="btn btn-success" id="btnEdit" data-id='+ item._id +'>Edit</button> <button class="btn btn-primary" id="btnView" data-id='+ item._id +' onClick="viewProduct(this)"> View</button></td>'
+      +'</tr>'
+    })
+    document.getElementById('tableBody').innerHTML = html;
+  })
+
+};
+function CreateProduct(){
+  console.log('gggggggggggggf');
+  var prodName = document.getElementById('productName').value;
+  var desc = document.getElementById('desc').value;
+  var quantity = document.getElementById('quantity').value;
+  var expiration = document.getElementById('expiration').value;
+  var formdata = {
+      product_name: prodName,
+      product_desc: desc,
+      product_quantity: quantity,
+      expiration_date: expiration
+  }
+  fetch('http://localhost:3001/product',  {
+    method: 'POST',
+    headers: {
+      'Accept':'application/json, text/plan, */*',
+      'Content-Type': 'application/json'
+
+    },
+    body: JSON.stringify(formdata)
+  }).then((response)=> response.json()
+  ).then((data)=>{
+    // let projects = datalist;
+    // projects.push(data);
+    // datalist =projects;
+    var newArray = datalist.concat(data);
+    console.log('success')
+  }).catch(err =>
+    console.log('parsing failed', err)
+  )
+};
+
+
+function viewProduct(e){
+  console.log('ffffffffffffffff')
+  var id = e.getAttribute('data-id');
+  console.log(id)
+  fetch('http://localhost:3001/product/' + id)
+  .then((response)=>response.json())
+  .then((data)=>{
+    console.log(data.product_name);
+    var el = document.getElementById('panelDiv');
+        el.style.visibility="";
+        document.getElementById('txtProdName').innerHTML =data.product_name;
+        document.getElementById('txtProdDesc').innerHTML =data.desc;
+        document.getElementById('txtProdQuantity').innerHTML =data.product_quantity;
+        document.getElementById('txtProdExp').innerHTML =data.expiration_date;
+
+  })
+}
+</script>

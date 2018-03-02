@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel="stylesheet" href="/dist/css/bootstrap.min.css">
+
+  </head>
+  <body>
+    <div class="container">
+      <div  class="row">
+        <!-- <div class = "col-md-8"> -->
+          <h1><%= title %></h1>
+          <hr>
+          <input type="submit" value="Create New Employee" id="createEmployeeForm" class="btn btn-primary">
+          <div id="createform">
+            <div class="col-md-4">
+              <form id = "userForm">
+                <label class="control-label">First Name: </label><input type="text" class="form-control" name="first_name" id="first_name"><br/>
+                <label class="control-label">Last Name: </label><input type="text" class="form-control" name="last_name" id="last_name"><br/>
+                <label class="control-label">Department: </label><input type="text" class="form-control" name="department" id="department"><br/>
+                <label class="control-label">Position: </label><input type="text" class="form-control" name="position" id="position"><br/>
+                <input type="submit" value="Save" id="createEmployeeProcess" class="btn btn-primary">
+                <input type="submit" value="cancel" id="btnClose" class="btn btn-warning">
+              </form>
+            </div>
+          </div>
+          <br/><br/>
+
+          <div class="col-md-6">
+          <table class="table table-hover" id="mytable">
+              <!-- <caption>Customer Info</caption><br/> -->
+          <thead>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Department</th>
+            <th>Position</th>
+            <th>Action</th>
+          </thead>
+          <tbody id="testResponce">
+              <% for(var i=0;i<result.length;i++){ %>
+                <tr id= <%= result[i]._id%>>
+                  <td><%= result[i].first_name %></td>
+                  <td><%= result[i].last_name %></td>
+                  <td><%= result[i].department %></td>
+                  <td><%= result[i].position %></td>
+                  <td style="padding: 7px; padding-bottom: 4px;">
+                    <a href="http://localhost:4300/employee/<%= result[i]._id %>" class="btn btn-info" id="btnView">View</i></a>
+                    <a href="http://localhost:4300/employee/editform/<%= result[i]._id %>" class="btn btn-success" id="btnEdit">Edit</i></a>
+                    <a class="btn btn-danger" id= "btnDelete" data-id="<%= result[i]._id %>">Delete</i></a>
+                  </td>
+              </tr>
+              <% } %>
+            </tbody>
+          </table>
+          <br/>
+          <hr/>
+        </div>
+      </div>
+      <!-- </div> -->
+      <div id="deleteModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Delete Employee</h4>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to delete this?</p>
+            <p>User ID - <span id = "userIdDelete"></span></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" id = "btnDeleteProcess">Yes</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
+<script src = "/dist/jquery.min.js"></script>
+<script src = "/js/modal.js"></script>
+<script>
+$(document).ready(function(){
+
+	$("#createform").addClass('hidden');
+});
+
+$('#createEmployeeForm').click(function(e){
+    $(this).addClass('hidden')
+    $("#createform").removeClass('hidden');
+});
+
+$(document).on('click',"#createEmployeeProcess",function(e){
+  e.preventDefault()
+  var last_name = $("#last_name").val(),
+      first_name = $("#first_name").val(),
+      department = $("#department").val(),
+      position = $("#position").val();
+
+  var formData = {
+    last_name:last_name, first_name: first_name, department:department, position:position
+  }
+  // console.log("Data-->" + JSON.stringify(formData));
+  var apicreateURL = "http://localhost:4300/employee";
+  $.ajax({
+    url : apicreateURL,
+    type: "POST",
+    dataType: 'json',
+    data: formData,
+    success: function (results) {
+      // var data = results.data;
+      console.log("DATA FOR CREATE===> " + JSON.stringify(results));
+        console.log("ITEM--> " + results.last_name)
+        $("#testResponce").append(
+          "<tr>"+
+          "<td>"+ results.first_name +"</td>"+
+          "<td>"+ results.last_name +"</td>"+
+          "<td>"+ results.department +"</td>"+
+          "<td>"+ results.position +"</td>"+
+          "<td style='padding: 7px; padding-bottom: 4px;'>"+
+            "<a href='http://localhost:4300/employee/"+ results._id +"' class='btn btn-info' id='btnView' data-id=" + results._id + " > View</a>"+
+            "<a href='http://localhost:4300/employee/editform/"+ results._id +"' class='btn btn-success' id='btnEdit' data-id=" + results._id + " > Edit</a>"+
+            "<a class='btn btn-danger' id='btnDelete' data-id=" + results._id + " > Delete</a>"+
+          " </td>" +
+          "</tr>"
+        )
+    		}
+  });
+  $("#last_name").val(''),
+  $("#first_name").val(''),
+  $("#department").val(''),
+  $("#position").val('');
+  $("#createform").addClass('hidden');
+  $("#createEmployeeForm").removeClass('hidden')
+
+});
+
+$(document).on('click', '#btnDelete', function(e){
+	$('#deleteModal').modal('toggle');
+	var id = $(this).attr('data-id');
+	$("#userIdDelete").html(id);
+});
+$(document).on('click','#btnDeleteProcess', function(e){
+  var delId = $("#userIdDelete").html();
+  var delUrl = 'http://localhost:4300/employee/'+ delId;
+  $.ajax({
+    url:delUrl,
+    type: "DELETE",
+    dataType: 'json',
+    data: {}
+
+  });
+  $('#deleteModal').modal('hide');
+  $('#mytable').html('');
+  $('#mytable').html(
+    '<table class="table table-hover" id="mytable">'+
+    '<thead>' +
+      '<th>First Name</th>'+
+      '<th>Last Name</th>'+
+      '<th>Department</th>'+
+      '<th>Position</th>'+
+      '<th>Action</th>' +
+    '</thead>' +
+    '<tbody id="testResponce">' +
+    $.ajax({
+      url:"http://localhost:4300/employee/all",
+      type: "POST",
+      dataType: 'json',
+      data: {},
+      succes:function(result){
+        console.log(result)
+        $.each(result.data, function(cons, item){ +
+          '<tr>'+
+            '<td>'+ item.first_name +'</td>'+
+            '<td>'+ item.last_name +'</td>'+
+            '<td>'+ item.department +'</td>'+
+            '<td>'+ item.position +'</td>'+
+            '<td style="padding: 7px; padding-bottom: 4px;">'+
+              '<a class="btn btn-info" id="btnView" data-id=' + item._id + ' > View</a>'+
+              '<a class="btn btn-success" id="btnEdit" data-id=' + item._id + ' > Edit</a>'+
+              '<a class="btn btn-danger" id="btnDelete" data-id=' + item._id + ' > Delete</a>'+
+            '</td>' +
+            '</tr>'
+
+        })+
+        '</tbody>' +
+      '</table>'
+      }
+    })
+
+  );
+
+});
+$("#btnClose").click(function(e){
+  e.preventDefault();
+  $("#createform").addClass('hidden');
+  $("#createEmployeeForm").removeClass('hidden')
+});
+</script>

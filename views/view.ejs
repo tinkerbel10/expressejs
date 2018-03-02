@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>my view</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel="stylesheet" href="/dist/css/bootstrap.min.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+          <h3>View Employee background</h3>
+          <div class="control-group">
+          <p>First Name: <label class="control-label"><span><%= result.first_name %></span></label></p>
+          <p>Last Name: <label class="control-label"><span><%= result.last_name %></span></label></p>
+          <p>Department: <label class="control-label"><span><%= result.department %></span></label></p>
+          <p>Position: <label class="control-label"><span><%= result.position %></span></label></p>
+          <a href="http://localhost:4300/employee" type = "submit" class = "btn btn-warning" id = "btnCancel">Back</a>
+          </div>
+        </div>
+      </div>
+  </body>
+</html>
+<script src = "/dist/jquery.min.js"></script>
+<script src = "/js/modal.js"></script>
+<script>
+
+</script>

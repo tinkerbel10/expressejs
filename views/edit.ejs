@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Edit Form</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel="stylesheet" href="/dist/css/bootstrap.min.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+          <h3>Update Employee background</h3>
+          <div class="control-group">
+            <div class="col-md-8">
+            <form id = "userForm">
+                <label class="control-label">First Name: </label><input type="text" class="form-control" name="first_name" id="first_name" value=<%= result.first_name %>><br/>
+                <label class="control-label">Last Name: </label><input type="text" class="form-control" name="last_name" id="last_name" value=<%= result.last_name %>><br/>
+                <label class="control-label">Department: </label><input type="text" class="form-control" name="department" id="department" value=<%= result.department %>><br/>
+                <label class="control-label">Position: </label><input type="text" class="form-control" name="position" id="position" value=<%= result.position %>><br/>
+                <input type="submit" value="Update" class="btn btn-primary" id="btnEdit"/>
+                <a href="http://localhost:4300/employee" type = "submit" class = "btn btn-warning" id = "btnCancel">Back</a>
+            </form>
+          </div>
+          </div>
+        </div>
+      </div>
+  </body>
+</html>
+<script src = "/dist/jquery.min.js"></script>
+<script src = "/js/modal.js"></script>
+<script>
+$(document).on('click', '#btnEdit', function(e){
+  e.preventDefault();
+  var getCurrentUrl = window.location.pathname.split("/");
+  var getId = getCurrentUrl[getCurrentUrl.length-1];
+  var first_name = $('#first_name').val(),
+      last_name = $('#last_name').val(),
+      department = $('#department').val(),
+      position = $('#position').val();
+  var formData = {
+    first_name: first_name,
+    last_name: last_name,
+    department:department,
+    position:position
+  }
+  $.ajax({
+
+    url : "http://localhost:4300/employee/" + getId,
+    data : formData,
+    dataType : 'json',
+    type : "POST",
+    success: function(data){
+      window.location.href="http://localhost:4300/employee";
+      // console.log("Update Data===> " + JSON.stringify(data));
+    }
+  });
+});
+</script>

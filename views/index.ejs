@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    <p>Welcome toASsaa <%= title %></p>
+    <button id = "btnJoinRoom" data-sample-id = "1">Join in Room 1</button>
+    <button id = "btnJoinRoom" data-sample-id = "2">Join in Room 2</button>
+    <button id = "btnShowData">Show console data per room</button>
+
+  </body>
+</html>
+
+<script src = "/dist/jquery.min.js"></script>
+<script src  = "http://localhost:4300/socket.io/socket.io.js"></script>
+<script>
+  var socket = io.connect('http://localhost:4300');
+
+(function(){
+    if(socket !== undefined){
+      console.log("connected in frontend");
+
+      socket.on('connection', function(data){
+          console.log(JSON.stringify(data));
+      });
+
+      socket.on('sampleSocket', function(data){
+        console.log("DATA--> " + JSON.stringify(data))
+      });
+    }
+})();
+
+
+$(document).on('click', '#btnJoinRoom', function(){
+  var sampleId = $(this).data('sample-id');
+  console.log("YOUR CURRENT ROOM IS--> " + sampleId);
+  socket.emit('join-room', {room : sampleId});
+});
+
+$("#btnShowData").click(function(){
+  socket.emit('createNotif', {})
+});
+</script>
